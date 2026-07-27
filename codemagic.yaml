@@ -1,6 +1,6 @@
 workflows:
   ios-workflow:
-    name: iOS Workflow
+    name: iOS App Store Build
 
     instance_type: mac_mini_m2
 
@@ -12,30 +12,61 @@ workflows:
         distribution_type: app_store
         bundle_identifier: com.easisoft.ianelab002
 
+      vars:
+        BUNDLE_ID: "com.easisoft.ianelab002"
+
     triggering:
       events:
         - push
+
       branch_patterns:
         - pattern: main
           include: true
           source: true
 
+
     scripts:
+
+      # Flutter 패키지 설치
       - name: Get Flutter packages
         script: |
           flutter pub get
 
-      - name: Build iOS
+
+      # CocoaPods 설치
+      - name: Install Pods
         script: |
-          flutter build ipa --release
+          cd ios
+          pod install
+
+
+      # Apple Signing 적용
+      - name: Set up iOS code signing
+        script: |
+          xcode-project use-profiles
+
+
+      # Flutter iOS Release 빌드
+      - name: Build IPA
+        script: |
+          flutter build ipa \
+            --release \
+            --export-options-plist=/Users/builder/export_options.plist
+
+
 
     artifacts:
       - build/ios/ipa/*.ipa
+      - build/ios/archive/*.xcarchive
+
 
     publishing:
-      email:
-        recipients:
-          - nxgong@gmail.com
-        notify:
-          success: true
-          failure: true
+
+      app_store_connect:
+
+        auth: integration
+
+        submit_to_testflight: true
+
+        beta_groups:
+          - Internal Testers
