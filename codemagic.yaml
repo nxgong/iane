@@ -15,30 +15,46 @@ workflows:
         distribution_type: app_store
         bundle_identifier: com.easisoft.ianelab002
 
-    triggering:
-      events:
-        - push
-
-      branch_patterns:
-        - pattern: main
-          include: true
-          source: true
-
     scripts:
+
       - name: Get Flutter packages
         script: |
           flutter pub get
 
-      - name: Setup iOS signing
+      - name: Setup signing
         script: |
           xcode-project use-profiles
 
+      - name: Create ExportOptions.plist
+        script: |
+          cat > /Users/builder/export_options.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+
+              <key>teamID</key>
+              <string>42S2GL9C3U</string>
+
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>com.easisoft.ianelab002</key>
+                  <string>iane002_AppStore_Profile</string>
+              </dict>
+          </dict>
+          </plist>
+          EOF
+
       - name: Build IPA
         script: |
-          flutter build ipa --release
+          flutter build ipa --release --export-options-plist=/Users/builder/export_options.plist
+
 
     artifacts:
       - build/ios/ipa/*.ipa
+
 
     publishing:
       app_store_connect:
