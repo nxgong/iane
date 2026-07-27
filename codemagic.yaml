@@ -5,8 +5,7 @@ workflows:
     instance_type: mac_mini_m2
 
     integrations:
-      app_store_connect: Codemagic Apple API
-
+      app_store_connect: AppStoreUpload
 
     environment:
       flutter: stable
@@ -50,16 +49,11 @@ workflows:
           flutter build ipa --release
 
 
-
     artifacts:
       - build/ios/ipa/*.ipa
-      - build/ios/archive/*.xcarchive
 
 
     publishing:
-
       app_store_connect:
-
         auth: integration
-
         submit_to_testflight: true
