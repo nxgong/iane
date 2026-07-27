@@ -7,6 +7,7 @@ workflows:
     integrations:
       app_store_connect: AppStoreUpload
 
+
     environment:
       flutter: stable
       xcode: latest
@@ -39,11 +40,6 @@ workflows:
           pod install
 
 
-      - name: Set up iOS code signing
-        script: |
-          xcode-project use-profiles
-
-
       - name: Build IPA
         script: |
           flutter build ipa --release
@@ -54,6 +50,7 @@ workflows:
 
 
     publishing:
+
       app_store_connect:
         auth: integration
         submit_to_testflight: true
