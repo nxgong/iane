@@ -12,13 +12,15 @@ workflows:
         distribution_type: app_store
         bundle_identifier: com.easisoft.ianelab002
 
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+
     scripts:
-
-      - name: Fetch signing files
-        script: |
-          keychain initialize
-          app-store-connect fetch-signing-files com.easisoft.ianelab002 --type IOS_APP_STORE --create
-
       - name: Get Flutter packages
         script: |
           flutter pub get
@@ -29,3 +31,11 @@ workflows:
 
     artifacts:
       - build/ios/ipa/*.ipa
+
+    publishing:
+      email:
+        recipients:
+          - nxgong@gmail.com
+        notify:
+          success: true
+          failure: true
